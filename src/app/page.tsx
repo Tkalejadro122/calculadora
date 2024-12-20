@@ -1,101 +1,211 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState } from 'react';
+import Boton from '@/components/Boton';
+import {
+  PiBackspace,
+  PiDivide,
+  PiInstagramLogo,
+  PiGithubLogo,
+} from 'react-icons/pi';
+
+const Home = () => {
+  const [resultado, setResultado] = useState('0');
+  const [operacion, setOperacion] = useState('');
+  const [pantalla, setPantalla] = useState('0');
+
+  const resetInput = async () => {
+    setPantalla('0');
+    setResultado('0');
+  };
+
+  const porcentaje = () => {
+    setPantalla((parseFloat(pantalla) / 100).toString());
+  };
+
+  const addPunto = () => {
+    if (!pantalla.includes('.') && pantalla.length !== 14) {
+      setPantalla(pantalla + '.');
+    }
+  };
+
+  const operar = () => {
+    const formatResult = (value: number) => {
+      const stringValue = value.toString();
+
+      // Si el número es menor a 10 caracteres, usa notación decimal
+      if (stringValue.includes('e') || stringValue.length > 10) {
+        return value.toExponential(10); // Notación científica con 10 dígitos significativos
+      }
+
+      // Si es menor a 14 caracteres y no está en notación científica
+      return value.toString();
+    };
+
+    if (operacion === '+') {
+      if (resultado === '0') {
+        setResultado(pantalla);
+      } else {
+        const result = parseFloat(resultado) + parseFloat(pantalla);
+        setResultado(formatResult(result));
+      }
+    } else if (operacion === '-') {
+      if (resultado === '0') {
+        setResultado(pantalla);
+      } else {
+        const result = parseFloat(resultado) - parseFloat(pantalla);
+        setResultado(formatResult(result));
+      }
+    } else if (operacion === '*') {
+      if (resultado === '0') {
+        setResultado(pantalla);
+      } else {
+        const result = parseFloat(resultado) * parseFloat(pantalla);
+        setResultado(formatResult(result));
+      }
+    } else if (operacion === '/') {
+      if (resultado === '0') {
+        setResultado(pantalla);
+      } else {
+        const result = parseFloat(resultado) / parseFloat(pantalla);
+        setResultado(formatResult(result));
+      }
+    } else {
+      setResultado(pantalla);
+    }
+  };
+
+  const dividir = () => {
+    operar();
+    setOperacion('/');
+    setPantalla('0');
+  };
+
+  const multiplicar = () => {
+    operar();
+    setOperacion('*');
+    setPantalla('0');
+  };
+
+  const restar = () => {
+    operar();
+    setOperacion('-');
+    setPantalla('0');
+  };
+
+  const sumar = () => {
+    operar();
+    setOperacion('+');
+    setPantalla('0');
+  };
+
+  const terminar = () => {
+    operar();
+    setOperacion('');
+    setPantalla('0');
+  };
+
+  const addInput = (input: string) => {
+    if (pantalla === '0') {
+      setPantalla(input);
+    } else if (pantalla.length !== 14) {
+      setPantalla(pantalla + input);
+    }
+  };
+
+  const deleteInput = () => {
+    if (pantalla.length > 1) {
+      setPantalla(pantalla.slice(0, -1));
+    } else {
+      setPantalla('0');
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className='bg-[#2c5545] w-full h-screen flex flex-col items-center'>
+      <p className=' mb-5 mt-4 text-[30px]'>Calculadora online</p>
+      <div className='bg-[#303030] w-[20rem] h-[33rem] rounded-[20px] flex flex-col items-center'>
+        <div className='w-[90%] h-[120px] bg-[#ececec] mt-4 rounded-[10px] flex flex-col align-center'>
+          <div className='h-[60px]'>
+            <p
+              className={`text-black ${
+                resultado.length > 10 ? 'text-[25px]' : 'text-[40px]'
+              } text-right w-[90%] lcd-pantalla`}
+            >
+              {resultado}
+            </p>
+          </div>
+          <div className='h-[60px]'>
+            <p
+              className={`text-black ${
+                pantalla.length > 10 ? 'text-[30px]' : 'text-[40px]'
+              } text-right w-[90%] lcd-pantalla`}
+            >
+              {pantalla}
+            </p>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div className='flex flex-col w-[90%] my-8 space-y-2'>
+          <div className='flex flex-row w-full space-x-3 justify-center'>
+            <Boton label='C' onClick={resetInput} className='operacion' />
+            <button
+              onClick={deleteInput}
+              className={`w-[60px] h-[60px] rounded-full text-[30px] bg-green-900 flex items-center justify-center`}
+            >
+              <PiBackspace />
+            </button>
+            <Boton label='%' onClick={porcentaje} className='operacion' />
+            <button
+              onClick={dividir}
+              className={`w-[60px] h-[60px] rounded-full text-[30px] bg-green-900 flex items-center justify-center`}
+            >
+              <PiDivide />
+            </button>
+          </div>
+          <div className='flex flex-row w-full space-x-3 justify-center'>
+            <Boton label='7' onClick={() => addInput('7')} />
+            <Boton label='8' onClick={() => addInput('8')} />
+            <Boton label='9' onClick={() => addInput('9')} />
+            <Boton label='x' onClick={multiplicar} className='operacion' />
+          </div>
+          <div className='flex flex-row w-full space-x-3 justify-center'>
+            <Boton label='4' onClick={() => addInput('4')} />
+            <Boton label='5' onClick={() => addInput('5')} />
+            <Boton label='6' onClick={() => addInput('6')} />
+            <Boton label='-' onClick={restar} className='operacion' />
+          </div>
+          <div className='flex flex-row w-full space-x-3 justify-center'>
+            <Boton label='1' onClick={() => addInput('1')} />
+            <Boton label='2' onClick={() => addInput('2')} />
+            <Boton label='3' onClick={() => addInput('3')} />
+            <Boton label='+' onClick={sumar} className='operacion' />
+          </div>
+          <div className='flex flex-row w-full space-x-3 justify-center'>
+            <p className='w-[60px] h-[60px]'></p>
+            <Boton label='0' onClick={() => addInput('0')} />
+            <Boton label='.' onClick={addPunto} />
+            <Boton label='=' onClick={terminar} className='operacion' />
+          </div>
+        </div>
+      </div>
+      <a
+        className='my-2 flex flex-row'
+        target='_blank'
+        href='https://www.instagram.com/kevin_tarazona2/'
+      >
+        <PiInstagramLogo className='text-[30px] rounded-lg bg-black mx-2' />
+        <p>@kevin_tarazona2</p>
+      </a>
+      <a
+        className='flex flex-row'
+        target='_blank'
+        href='https://github.com/Tkalejadro122'
+      >
+        <PiGithubLogo className='text-[30px] rounded-lg bg-black mx-2' />
+        <p>@Tkalejadro122</p>
+      </a>
     </div>
   );
-}
+};
+
+export default Home;
